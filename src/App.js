@@ -2,13 +2,11 @@ import "./App.css";
 import { useState, useEffect } from "react";
 
 function App() {
-  const [lat, setLat] = useState();
-  const [lon, setLon] = useState();
-  const [nearestStationData, setNearestStationData] = useState();
+  const [stationData, setStationData] = useState();
+  const [departureData, setdepartureData] = useState();
   const [error, setError] = useState();
 
   async function queryMvg(lat, lon) {
-    // https://www.mvg.de/api/fib/v2/station/nearby?latitude=48.132534&longitude=11.609269
     const response = await fetch(
       `https://www.mvg.de/api/fib/v2/station/nearby?latitude=${lat}&longitude=${lon}`
     );
@@ -17,7 +15,8 @@ function App() {
       return;
     }
     const data = await response.json();
-    // console.log(data);
+
+    setStationData(data[0]);
 
     const stationId = data[0].globalId;
 
@@ -29,15 +28,13 @@ function App() {
       return;
     }
     const departureData = await departureResponse.json();
-    console.log(departureData);
-    setNearestStationData(departureData);
+
+    setdepartureData(departureData);
   }
 
   async function locationSuccess(position) {
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
-    setLat(latitude);
-    setLon(longitude);
 
     await queryMvg(latitude, longitude);
   }
@@ -68,13 +65,35 @@ function App() {
 
   return (
     <div className="App">
-      <p>Lat: {lat}</p>
-      <p>Long: {lon}</p>
       {error && <p>{error}</p>}
-      {nearestStationData && (
+      {stationData && (
+        <div>
+          <h2>Station Information</h2>
+          <p>
+            <strong>Name:</strong> {stationData.name}
+          </p>
+          <p>
+            <strong>Place:</strong> {stationData.place}
+          </p>
+          <p>
+            <strong>Transport Types:</strong>{" "}
+            {stationData.transportTypes.join(", ")}
+          </p>
+          <p>
+            <strong>Aliases:</strong> {stationData.aliases}
+          </p>
+          <p>
+            <strong>Tariff Zones:</strong> {stationData.tariffZones}
+          </p>
+          <p>
+            <strong>Distance in Meters:</strong> {stationData.distanceInMeters}
+          </p>
+        </div>
+      )}
+      {departureData && (
         <div>
           <h2>Departure Information</h2>
-          {nearestStationData.map((departure, index) => (
+          {departureData.map((departure, index) => (
             <div key={index}>
               <p>
                 <strong>Transport Type:</strong> {departure.transportType}
