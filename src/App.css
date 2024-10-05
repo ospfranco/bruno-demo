@@ -61,7 +61,11 @@
 }
 
 .departure-item {
-  margin-bottom: 20px;
+  padding: 10px;
+}
+
+.station-data {
+  padding: 10px;
 }
 
 .departure-item hr {

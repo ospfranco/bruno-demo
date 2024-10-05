@@ -71,20 +71,23 @@ function App() {
           <div className="station-header">
             <h2>Nearest station</h2>
           </div>
-          <p>{stationData.name}</p>
-          <p>
-            <strong>Transport Types:</strong>{" "}
-            {stationData.transportTypes.join(", ")}
-          </p>
-          <p>
-            <strong>Aliases:</strong> {stationData.aliases}
-          </p>
-          <p>
-            <strong>Tariff Zones:</strong> {stationData.tariffZones}
-          </p>
-          <p>
-            <strong>Distance in Meters:</strong> {stationData.distanceInMeters}
-          </p>
+          <div className="station-data">
+            <p>{stationData.name}</p>
+            <p>
+              <strong>Transport Types:</strong>{" "}
+              {stationData.transportTypes.join(", ")}
+            </p>
+            <p>
+              <strong>Aliases:</strong> {stationData.aliases}
+            </p>
+            <p>
+              <strong>Tariff Zones:</strong> {stationData.tariffZones}
+            </p>
+            <p>
+              <strong>Distance in Meters:</strong>{" "}
+              {stationData.distanceInMeters}
+            </p>
+          </div>
         </div>
       )}
       {departureData && (
