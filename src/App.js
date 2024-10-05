@@ -64,17 +64,14 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      {error && <p>{error}</p>}
+    <div>
+      {!!error && <p className="error">{error}</p>}
       {stationData && (
         <div>
-          <h2>Station Information</h2>
-          <p>
-            <strong>Name:</strong> {stationData.name}
-          </p>
-          <p>
-            <strong>Place:</strong> {stationData.place}
-          </p>
+          <div className="station-header">
+            <h2>Nearest station</h2>
+          </div>
+          <p>{stationData.name}</p>
           <p>
             <strong>Transport Types:</strong>{" "}
             {stationData.transportTypes.join(", ")}
@@ -92,32 +89,33 @@ function App() {
       )}
       {departureData && (
         <div>
-          <h2>Departure Information</h2>
+          <div className="station-header">
+            <h2>Departure Information</h2>
+          </div>
+
           {departureData.map((departure, index) => (
-            <div key={index}>
-              <p>
-                <strong>Transport Type:</strong> {departure.transportType}
+            <div key={index} className="departure-item">
+              <p
+                style={{
+                  backgroundColor: departure.cancelled ? "red" : "transparent",
+                }}
+              >
+                <strong>{departure.transportType}</strong> {departure.label} to{" "}
+                {departure.destination}
               </p>
               <p>
-                <strong>Label:</strong> {departure.label}
+                <strong>Planned:</strong>{" "}
+                {new Date(departure.plannedDepartureTime).toLocaleTimeString()}
               </p>
               <p>
-                <strong>Destination:</strong> {departure.destination}
+                <strong>Realtime:</strong>{" "}
+                {new Date(departure.realtimeDepartureTime).toLocaleTimeString()}
               </p>
-              <p>
-                <strong>Planned Departure Time:</strong>{" "}
-                {new Date(departure.plannedDepartureTime).toLocaleString()}
-              </p>
-              <p>
-                <strong>Realtime Departure Time:</strong>{" "}
-                {new Date(departure.realtimeDepartureTime).toLocaleString()}
-              </p>
-              <p>
-                <strong>Delay in Minutes:</strong> {departure.delayInMinutes}
-              </p>
-              <p>
-                <strong>Cancelled:</strong> {departure.cancelled ? "Yes" : "No"}
-              </p>
+              {departure.delayInMinutes > 0 && (
+                <p>
+                  <strong>Delay:</strong> {departure.delayInMinutes} min
+                </p>
+              )}
               <p>
                 <strong>Occupancy:</strong> {departure.occupancy}
               </p>

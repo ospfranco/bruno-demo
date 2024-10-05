@@ -1,10 +1,4 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -35,4 +29,44 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.station-header {
+  background-color: #add8e6;
+  color: white;
+  padding: 10px;
+}
+
+.station-info h2,
+.departure-info h2 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.station-info p,
+.departure-info p {
+  color: #555;
+  margin: 5px 0;
+}
+
+.station-info strong,
+.departure-info strong {
+  color: #000;
+}
+
+.departure-item {
+  margin-bottom: 20px;
+}
+
+.departure-item hr {
+  border: 0;
+  height: 1px;
+  background: #ddd;
+  margin: 10px 0;
 }
