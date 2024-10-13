@@ -6,6 +6,19 @@ import {
   InfoWindow,
   Marker,
 } from "@vis.gl/react-google-maps";
+import { FaBus, FaTrain, FaTram } from "react-icons/fa";
+
+async function fetchStationsData(lat: number, lon: number) {
+  const response = await fetch(
+    `https://www.mvg.de/api/fib/v2/station/nearby?latitude=${lat}&longitude=${lon}`
+  );
+  if (!response.ok) {
+    console.error("Failed to fetch station data from MVG API");
+    return;
+  }
+  const stationData = await response.json();
+  return stationData;
+}
 
 async function getStationDepartures(stationId: string) {
   const response = await fetch(
@@ -39,26 +52,18 @@ function App() {
   }, [stationData]);
 
   async function queryMvg(lat: number, lon: number) {
-    const response = await fetch(
-      `https://www.mvg.de/api/fib/v2/station/nearby?latitude=${lat}&longitude=${lon}`
-    );
-    if (!response.ok) {
-      console.error("Failed to fetch data from MVG API");
-      return;
-    }
-    const data = await response.json();
+    let data = await fetchStationsData(lat, lon);
 
-    if (!data || data.length === 0) {
-      setError("No station data found");
-      return;
-    }
-
-    setStationData(data.slice(0, 3));
+    setStationData(data.slice(0, 4));
   }
 
   async function locationSuccess(position: GeolocationPosition) {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
+    let latitude = 48.132284;
+    let longitude = 11.609243;
+    if (process.env.NODE_ENV !== "development") {
+      latitude = position.coords.latitude;
+      longitude = position.coords.longitude;
+    }
 
     await queryMvg(latitude, longitude);
     setLat(latitude);
@@ -108,8 +113,9 @@ function App() {
 
               return (
                 <InfoWindow
-                  minWidth={300}
-                  maxWidth={300}
+                  className="info-window"
+                  minWidth={350}
+                  maxWidth={350}
                   headerDisabled
                   disableAutoPan
                   position={{
@@ -117,104 +123,57 @@ function App() {
                     lng: station.longitude,
                   }}
                 >
-                  <div>
-                    <h2>{station.name}</h2>
-                    {departures
-                      ?.slice(0, 6)
-                      .map((departure: any, index: number) => (
-                        <div key={index} style={{ paddingBottom: 10 }}>
-                          <p
-                            style={{
-                              backgroundColor: departure.cancelled
-                                ? "red"
-                                : "transparent",
-                            }}
-                          >
-                            <strong>{departure.transportType}</strong>{" "}
-                            {departure.label} to {departure.destination}
-                          </p>
-                          <p>
+                  <div className="station-header">
+                    <p className="station-title">{station.name}</p>
+                  </div>
+                  {departures
+                    ?.slice(0, 6)
+                    .map((departure: any, index: number) => {
+                      let minuteDiff = Math.round(
+                        (new Date(departure.realtimeDepartureTime).getTime() -
+                          new Date().getTime()) /
+                          60000
+                      );
+
+                      return (
+                        <div key={index} className="departure">
+                          {/* <p
+                          style={{
+                            backgroundColor: departure.cancelled
+                              ? "red"
+                              : "transparent",
+                          }}
+                        > */}
+                          {departure.transportType === "BUS" && <FaBus />}
+                          {departure.transportType === "TRAM" && <FaTram />}
+                          {departure.transportType === "UBAHN" && (
+                            <FaTrain />
+                          )}{" "}
+                          <p className="departure-label">{departure.label}</p>
+                          {departure.destination.length > 20
+                            ? `${departure.destination.substring(0, 20)}...`
+                            : departure.destination}
+                          {/* </p> */}
+                          <div style={{ flex: 1 }} />
+                          <span>
+                            {minuteDiff > 0 && <span>in {minuteDiff}m </span>}
                             <strong>
                               {new Date(
                                 departure.realtimeDepartureTime
-                              ).toLocaleTimeString()}{" "}
-                              (+{departure.delayInMinutes})
-                            </strong>{" "}
-                          </p>
-                          {/* {departure.delayInMinutes > 0 && (
-                        <p>
-                          <strong>Delay:</strong> {departure.delayInMinutes} min
-                        </p>
-                      )} */}
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </strong>
+                          </span>
                         </div>
-                      ))}
-                  </div>
+                      );
+                    })}
                 </InfoWindow>
               );
             })}
         </Map>
       </APIProvider>
-      {/* {stationData && (
-        <div>
-          <div className="station-header">
-            <h2>Nearest station</h2>
-          </div>
-          <div className="station-data">
-            <p>{stationData.name}</p>
-            <p>
-              <strong>Transport Types:</strong>{" "}
-              {stationData.transportTypes.join(", ")}
-            </p>
-            <p>
-              <strong>Aliases:</strong> {stationData.aliases}
-            </p>
-            <p>
-              <strong>Tariff Zones:</strong> {stationData.tariffZones}
-            </p>
-            <p>
-              <strong>Distance in Meters:</strong>{" "}
-              {stationData.distanceInMeters}
-            </p>
-          </div>
-        </div>
-      )}
-      {departureData && (
-        <div>
-          <div className="station-header">
-            <h2>Departure Information</h2>
-          </div>
-
-          {departureData.map((departure, index) => (
-            <div key={index} className="departure-item">
-              <p
-                style={{
-                  backgroundColor: departure.cancelled ? "red" : "transparent",
-                }}
-              >
-                <strong>{departure.transportType}</strong> {departure.label} to{" "}
-                {departure.destination}
-              </p>
-              <p>
-                <strong>Planned:</strong>{" "}
-                {new Date(departure.plannedDepartureTime).toLocaleTimeString()}
-              </p>
-              <p>
-                <strong>Realtime:</strong>{" "}
-                {new Date(departure.realtimeDepartureTime).toLocaleTimeString()}
-              </p>
-              {departure.delayInMinutes > 0 && (
-                <p>
-                  <strong>Delay:</strong> {departure.delayInMinutes} min
-                </p>
-              )}
-              <p>
-                <strong>Occupancy:</strong> {departure.occupancy}
-              </p>
-              <hr />
-            </div>
-          ))}
-        </div>
-      )} */}
     </div>
   );
 }

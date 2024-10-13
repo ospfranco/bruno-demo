@@ -38,39 +38,32 @@
 }
 
 .station-header {
-  background-color: #add8e6;
-  color: white;
-  padding: 10px;
+  padding: 0 0 10px 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.station-info h2,
-.departure-info h2 {
-  color: #333;
-  margin-bottom: 10px;
+.station-title {
+  color: #4a90e2;
+  font-size: 1.5em;
+  font-weight: bold;
 }
 
-.station-info p,
-.departure-info p {
-  color: #555;
-  margin: 5px 0;
+.departure {
+  display: flex;
+  flex-direction: row;
+  padding: 5px 0 5px 0;
 }
 
-.station-info strong,
-.departure-info strong {
-  color: #000;
+.departure-label {
+  font-weight: bold;
+  width: 32px;
+  text-align: right;
+  padding: 0 5px 0 0;
 }
 
-.departure-item {
-  padding: 10px;
-}
-
-.station-data {
-  padding: 10px;
-}
-
-.departure-item hr {
-  border: 0;
-  height: 1px;
-  background: #ddd;
-  margin: 10px 0;
+.in-divider {
+  padding: 0 5px 0 5px;
 }
