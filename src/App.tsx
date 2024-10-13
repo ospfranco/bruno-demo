@@ -61,6 +61,8 @@ function App() {
     const longitude = position.coords.longitude;
 
     await queryMvg(latitude, longitude);
+    setLat(latitude);
+    setLon(longitude);
   }
 
   function onError(e: GeolocationPositionError) {
